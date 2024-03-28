@@ -59,30 +59,39 @@ delay_ms:
             djnz R2, del3  //2T
 ret //2T
 
+
+//RS=0 command mode, RS=1 data mode
+//EN=1 LCD ready to be read or write
 send_command:
 //define subroutine here
-//Instruction set: 11010000 pop from stack, 清空DPTR内容
-mov DPTR, #11010000B
+mov DPTR, #11010000B  //send to CPLD, D7 to D0(Define the place where to send)
 mov @DPTR, A//send command stored in accomulator
-mov DPTR, #11100000B //movx A, @DPTR //把表中的东西存A里面
-mov A, #00010000B //Set RS 0 and E 1
+mov DPTR, #11100000B //movx A, @DPTR //sent to CPLD CS3MODE register RS and E pins
+
+mov A, #00010000B //Set RS 0 and E 1, here we enter command mode and enables read or write data
 movx @DPTR, A //send command stored in accomulator
-mov A, #00000000B //Set RS 0 and E 0
+mov A, #00000000B //Set RS 0 and E 0, just shut down everything
 movX @DPTR, A //send command stored in accomulator
 ret
 
 send_data:
 //define subroutine here
-mov DPTR, #11010000B
+mov DPTR, #11010000B  //send to CPLD, D7 to D0(Define the place where to send)
 movx @DPTR, A
 mov DPTR, #11100000B
 movx @DPTR, A
-mov A, #00110000B //Set RS 1 and E 1
+
+mov A, #00110000B //Set RS 1 and E 1, here we enter data mode and enables LCD read or write data
 movx @DPTR, A
-mov A, #00100000 //Set RS 1 and E 0
+mov A, #00100000B //Set RS 1 and E 0, same data mode but disable the rw function
 movx @DPTR, A
 ret
 
+LCD_DISPLAY:
+    org 8000H
+//这里交替查表找指令， lcall 发送指令和 lcall delay就完事了    
+
+ret
 
 
 MAIN:
@@ -130,8 +139,8 @@ BUTTON1_NOT_PRESSED:
 BUTTON2_NOT_PRESSED:
       jmp LED_TURN_ON_LOOP
 
-  clr RS
-  clr RTC_INT
+  //clr RS
+  //clr RTC_INT
   //clr LED_Y //turn on LED
 
   //Upper letter from A-Z
