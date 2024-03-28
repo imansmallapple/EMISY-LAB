@@ -48,16 +48,42 @@ L2:    djnz r0, L2
 
 //TASK 2
 //designed time delay subroutine to generate approx. 5 to 10 ms delay, I assume 6 ms here = 6000 us = 6000 periods
-//这里我选用三重循环延时程序
+//这里我选用三重循环延时程序, 自己做的不是GPT生成的嗷
 //delay calculation: {[(2*14+1+2)*14+1+2]*14+1+2}*(1/12)*12 = 6121 us = 6.121 ms
 delay_ms:
- del4：     mov R2, #14D   //1 T
- del3:      mov R1, #14D   //1 T
- del2:      mov R0, #14D   //1 T
- del1:      djnz R0, del1  //2 T
-            djnz R1, del2  //2 T 
-            djnz R2, del3  //2 T
-ret //2 T
+ del4：     mov R2, #14D   //1T
+ del3:      mov R1, #14D   //1T
+ del2:      mov R0, #14D   //1T
+ del1:      djnz R0, del1  //2T
+            djnz R1, del2  //2T 
+            djnz R2, del3  //2T
+ret //2T
+
+send_command:
+//define subroutine here
+//Instruction set: 11010000 pop from stack, 清空DPTR内容
+mov DPTR, #11010000B
+mov @DPTR, A//send command stored in accomulator
+mov DPTR, #11100000B //movx A, @DPTR //把表中的东西存A里面
+mov A, #00010000B //Set RS 0 and E 1
+movx @DPTR, A //send command stored in accomulator
+mov A, #00000000B //Set RS 0 and E 0
+movX @DPTR, A //send command stored in accomulator
+ret
+
+send_data:
+//define subroutine here
+mov DPTR, #11010000B
+movx @DPTR, A
+mov DPTR, #11100000B
+movx @DPTR, A
+mov A, #00110000B //Set RS 1 and E 1
+movx @DPTR, A
+mov A, #00100000 //Set RS 1 and E 0
+movx @DPTR, A
+ret
+
+
 
 MAIN:
   //org 8000H
@@ -91,7 +117,7 @@ MAIN:
        setb LED_Y//this should locate in initialization code part
 LED_TURN_ON_LOOP:
       //Load 255 inside A register
-      mov A, #0xFF   //Or maybe #0FFH, I'm not sure
+      mov A, #0FFH   //put 255 inside
       mov A, BUTTON0 //Load LED button pin into A register
       jb SW1, BUTTON1_NOT_PRESSED
       //if press then we check button 2
@@ -107,5 +133,12 @@ BUTTON2_NOT_PRESSED:
   clr RS
   clr RTC_INT
   //clr LED_Y //turn on LED
+
+  //Upper letter from A-Z
+  TAB1: DB 41H, 42H, 43H, 44H, 45H, 46H, 47H, 48H, 49H, 4AH, 4BH, 4CH, 4DH, 4EH, 4FH, 50H, 51H, 52H, 53H, 54H, 55H, 56H, 57H, 58H, 59H, 5AH
+  //Lower letter from a-z
+  TAB2: DB 61H, 62H, 63H, 64H, 65H, 66H, 67H, 68H, 69H, 6AH, 6BH, 6CH, 6DH, 6EH, 6FH, 70H, 71H, 72H, 73H, 74H, 75H, 76H, 77H, 78H, 79H, 7AH
+  //Chen Song
+  TAB3: DB 43H, 68H, 65H, 6EH, 20H, 53H, 6FH, 6EH, 67H
 END
 
