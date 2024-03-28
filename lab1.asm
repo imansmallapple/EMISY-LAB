@@ -19,6 +19,7 @@ EN equ P1.5//This pin is used to enable the LCD module. When data is ready to be
 //Each button is connected to a specific pin, and when a button is pressed, it changes the state of that pin.
 
 //setb LED_Y is turn off LED and clr LED_Y is turn on LED
+/*
 //turn off the LED
        setb LED_Y
 START:
@@ -36,26 +37,7 @@ L1:    mov r0, #0xff
 L2:    djnz r0, L2
        djnz r1, L1
        sjmp START
-
-//优化后的代码
-//setb LED_Y is turn off LED and clr LED_Y is turn on LED
-//turn off the LED
-       setb LED_Y//this should locate in initialization code part
-LED_TURN_ON_LOOP:
-      //Load 255 inside A register
-      mov A, #0xFF   //Or maybe #0FFH, I'm not sure
-      mov A, BUTTON0 //Load LED button pin into A register
-      jnb SW1, BUTTON1_PRESSED
-      //button 1 pressed 
-      jmp LED_TURN_ON_LOOP
-
-
-      
-
-
-
-
-
+*/
 
 MAIN:
   //org 8000H
@@ -81,6 +63,29 @@ MAIN:
   mov P1MDOUT, #0FFH
   mov P0SKIp, #0FFH
   mov P1SKIP, #0FFH
+
+//TASK 1 PART CODE
+//优化后的代码
+//setb LED_Y is turn off LED and clr LED_Y is turn on LED
+//turn off the LED
+       setb LED_Y//this should locate in initialization code part
+LED_TURN_ON_LOOP:
+      //Load 255 inside A register
+      mov A, #0xFF   //Or maybe #0FFH, I'm not sure
+      mov A, BUTTON0 //Load LED button pin into A register
+      jb SW1, BUTTON1_NOT_PRESSED
+      //if press then we check button 2
+      jb SW2, BUTTON2_NOT_PRESSED
+      //if pressed then we turn on the LED
+      clr LED_Y
+      jmp LED_TURN_ON_LOOP //keep iterating the loop and make the light always working
+BUTTON1_NOT_PRESSED:
+      jmp LED_TURN_ON_LOOP
+BUTTON2_NOT_PRESSED:
+      jmp LED_TURN_ON_LOOP
+
+
+
 
   clr RS
   clr RTC_INT
