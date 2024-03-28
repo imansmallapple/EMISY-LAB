@@ -11,12 +11,19 @@ RTC_INT equ P1.3//This pin is typically found on a Real Time Clock (RTC) module,
 RS equ P0.6//This pin is used to switch between command mode (RS=0) and data mode (RS=1). In command mode, we send commands such as clear display, cursor position, etc. In data mode, we send data which is to be displayed on the LCD
 EN equ P1.5//This pin is used to enable the LCD module. When data is ready to be read or written, this pin is set high
 
-//Task 1:
+//Task 1
 // turn on the EFM8BB1LCK LED only when selected combination of LCD board buttons is pressed
 //Student should be able to answer questions about the keyboard configuration, LED configuration and LCD display
 //Keyboard configuration:
 //The keyboard on the LCD board is configured through the GPIO (General Purpose Input/Output) pins on the microcontroller. 
 //Each button is connected to a specific pin, and when a button is pressed, it changes the state of that pin.
+
+//LED configuration:
+//The user LED on the EFM8BB1LCK is also connected to a GPIO pin on the microcontroller. 
+//We use BUTTON0 to turn on the LED light
+
+//LCD connection:
+//The LCD display is connected to the microcontroller through several pins. These include the RS (Register Select) pin, which switches between command and data modes, and the EN (Enable) pin, which enables the LCD module. The LCD also includes a shift register for controlling the display. 
 
 //setb LED_Y is turn off LED and clr LED_Y is turn on LED
 /*
@@ -38,6 +45,19 @@ L2:    djnz r0, L2
        djnz r1, L1
        sjmp START
 */
+
+//TASK 2
+//designed time delay subroutine to generate approx. 5 to 10 ms delay, I assume 6 ms here = 6000 us = 6000 periods
+//这里我选用三重循环延时程序
+//delay calculation: {[(2*14+1+2)*14+1+2]*14+1+2}*(1/12)*12 = 6121 us = 6.121 ms
+delay_ms:
+ del4：     mov R2, #14D   //1 T
+ del3:      mov R1, #14D   //1 T
+ del2:      mov R0, #14D   //1 T
+ del1:      djnz R0, del1  //2 T
+            djnz R1, del2  //2 T 
+            djnz R2, del3  //2 T
+ret //2 T
 
 MAIN:
   //org 8000H
@@ -83,9 +103,6 @@ BUTTON1_NOT_PRESSED:
       jmp LED_TURN_ON_LOOP
 BUTTON2_NOT_PRESSED:
       jmp LED_TURN_ON_LOOP
-
-
-
 
   clr RS
   clr RTC_INT
