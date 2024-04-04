@@ -48,7 +48,7 @@ L2:    djnz r0, L2
 
 //TASK 2
 //designed time delay subroutine to generate approx. 5 to 10 ms delay, I assume 6 ms here = 6000 us = 6000 periods
-//这里我选用三重循环延时程序, 自己做的不是GPT生成的嗷
+//这里我选用三重循环延时程序
 //delay calculation: {[(2*14+1+2)*14+1+2]*14+1+2}*(1/12)*12 = 6121 us = 6.121 ms
 delay_ms:
  del4：     mov R2, #14D   //1T
