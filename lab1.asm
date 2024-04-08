@@ -91,6 +91,35 @@ LCD_DISPLAY:
     org 8000H
 //这里交替查表找指令， lcall 发送指令和 lcall delay就完事了    
 
+//+++++++++++++++SET UP++++++++++++++++//
+//Function Set
+    mov A, #00111000B
+    lcall send_command
+    lcall delay_ms
+
+//Display On
+    mov A, #00001100B
+    lcall send_command
+    lcall delay_ms
+
+//Display Clear
+    mov A, #00000001B
+    lcall send_command
+    lcall delay_ms
+
+//Entry Mode Set
+    mov A, #00000110B
+    lcall send_command
+    lcall delay_ms
+//++++++++++++++++++SET UP++++++++++++++//
+
+
+    mov A, #00000000B
+    lcall send_command
+    lcall delay_ms
+    mov A, #53H
+    lcall send_data
+    lcall delay_ms
 ret
 
 
